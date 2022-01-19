@@ -1,0 +1,11 @@
+# Default ignored files
+/shelf/
+/workspace.xml
+# Datasource local storage ignored files
+/../../../../../../:\Users\ec339\PycharmProjects\litspy\.idea
+/dataSources.local.xml
+# Editor-based HTTP Client requests
+/httpRequests/
+# project-specific ignored files
+/litspy/epmc_fields.xml
+/.idea/

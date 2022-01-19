@@ -1,0 +1,9 @@
+wordcloud
+pandas
+matplotlib
+requests
+beautifulsoup4
+lxml
+xlrd
+openpyxl
+rtgo >=0.0.5
