@@ -80,7 +80,7 @@ documents containing CFTR AND normal diet AND biomarker, and also documents cont
 To get an output file of the results summary and details in Excel format, use `-o` (or `--outfile`) followed by
 the full path to an output file:
 
-`python -m litspy -CFTR -d arthritis -o /home/myusername/documents/litspy_outputs/output1.xlsx`
+`python -m litspy -g CFTR -d arthritis -o /home/myusername/documents/litspy_outputs/output1.xlsx`
  
 If you provide a path to an existing file, the file will be overwritten. If you provide a path to a new file, the new 
 file will be created.
