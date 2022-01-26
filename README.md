@@ -147,9 +147,6 @@ MIT (see LICENCE.txt)
 ## CHANGE LOG
 This is the first version of the tool, so there are currently no changes
 
-## TESTS
-[test suite is under development]
-
 ## ACKNOWLEDGEMENTS
 **OmixLitMiner**
 
