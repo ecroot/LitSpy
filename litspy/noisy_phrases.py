@@ -111,8 +111,8 @@ common_gene_noise = ["ALA", "ARG", "ASN", "ASP", "CYS", "GLN", "GLU", "GLY", "HI
                      "TAG", "TAP", "TAP", "TASK", "TAPS", "TAUT", "TEMP", "THANK", "THE", "THETA", "TIED", "TIM", "TIM",
                      "TIM", "TIP", "TOP", "TRADE", "TRAIL", "TRAIL", "TRAITS", "TRAM", "TRAMP", "TRANCE", "TRAP",
                      "TRAP", "TRIM", "TRIP", "TROY", "TUBE", "TUG", "TUG", "TUNA", "TWEAK", "TWINKLE", "TYPE", "VISA",
-                     "WAR", "WARS", "WARTS", "WAS", "WASP", "WASPS", "WAVE", "WAVE", "WHIP", "WHISTLE", "WIRE", "WISH", "YES",
-                     "ZETA", "ZIP"
+                     "WAR", "WARS", "WARTS", "WAS", "WASP", "WASPS", "WAVE", "WAVE", "WHIP", "WHISTLE", "WIRE", "WISH",
+                     "WISP", "YES", "ZETA", "ZIP"
                      ]
 
 stop_words = ["a", "able", "about", "across", "after", "all", "almost", "also", "am", "among", "an", "and", "any",

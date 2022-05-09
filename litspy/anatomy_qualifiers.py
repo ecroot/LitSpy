@@ -112,7 +112,7 @@ anatomy_qualifiers = {'trachea': ['Endotracheal', 'Paratracheal', 'Tracheobronch
                       'jugular vein': ['Hepatojugular'],
                       'tail': ['Caudal'],
                       'fallopian tube': ['Tubo-Ovarian'],
-                      'ovary': ['Tubo-Ovarian'],
+                      'ovary': ['Ovarian', 'Tubo-Ovarian'],
                       'alveoli': ['Alveolar'],
                       'bronchi': ['Tracheobronchial', 'bronchial'],
                       'retina': ['Retinal'],
