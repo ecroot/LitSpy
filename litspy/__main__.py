@@ -309,10 +309,11 @@ class LitSpy:
         """
         summary_results = {}
         for each in results_dicts:
-            # count the unique, non-empty results
-            res_list = [d for d in each['true_result_doc_info'] if d.get('ID') != 'none']
-            num_results = len(res_list)
-            if num_results >= 1000:
+            if each['res_count'] < 1000:
+                # count the unique, non-empty results
+                res_list = [d for d in each['true_result_doc_info'] if d.get('ID') != 'none']
+                num_results = len(res_list)
+            else:
                 num_results = "Over 1000"
 
             summary_results[each['gene key']] = {'gene name': each['gene name'], 'search terms': each['search terms'],

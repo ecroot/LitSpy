@@ -1151,6 +1151,7 @@ class Query:
         """
         # initialise job handler and potential results list
         ReadyThready.set_logger(self.logger)
+        root_doc_info = []
 
         # extract the lists of queries from the dict
         queries = queries_dict['queries']
@@ -1175,11 +1176,13 @@ class Query:
                              f"queries in Europe PMC")
 
             root_doc_info = [item for sublist in root_results for item in sublist]
+            print(len(root_doc_info))
             doc_info.extend(root_doc_info)
 
         # add the list of results text strings to the dictionary
         queries_dict["query_strings"] = query_strings
         queries_dict["true_result_doc_info"] = doc_info
+        queries_dict["res_count"] = res_count + len(root_doc_info)
 
         # remove the queries from the dict as they are no longer needed
         del queries_dict['root queries']
