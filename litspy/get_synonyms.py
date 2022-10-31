@@ -1,5 +1,4 @@
 import requests
-# import curlify
 import json
 import re
 from time import sleep
@@ -42,7 +41,7 @@ class OLSRequests:
         # raise relevant exceptions if there are errors for the request
         except (requests.exceptions.HTTPError, requests.exceptions.ConnectionError) as err:
             self.logger.error(err)
-            exit()
+            exit() # note: exit commands do not work when running within a thread - which this command often is
         # log status code of response
         self.logger.info(f"{threading.current_thread().name}: {res} for {url}")
         # parse the test of the response in to a dict
@@ -731,8 +730,8 @@ class GetUniprotSynonyms:
         :return: url (str)
         """
         # build the query string with the id type, gene id and tax id from a single data frame row
-        query = f"https://www.uniprot.org/uniprot/?query={self.id_type}:{self.gene_id}+organism:{self.tax_id}+" \
-                f"reviewed:yes&columns=genes&format=tab"
+        query = f"https://rest.uniprot.org/uniprotkb/search?query={self.id_type}:{self.gene_id}+organism_id:{self.tax_id}+" \
+                f"reviewed:true&columns=genes&format=tsv"
         return query
 
     def run_uniprot_query(self, query):
@@ -754,7 +753,8 @@ class GetUniprotSynonyms:
             self.logger.error(f"{threading.current_thread().name}: Unable to collect gene synonyms for "
                               f"'{self.gene_id}' (type: {self.id_type}, taxonomy id: {self.tax_id}) from uniprot.org")
             self.logger.error(err)
-            exit()
+            # exit() # note: exit commands do not work when running within a thread - which this command often is
+            return "uniprot request failed"
 
     def extract_uniprot_syns(self, res):
         """
@@ -784,10 +784,14 @@ class GetUniprotSynonyms:
         query = self.build_uniprot_query()
         self.logger.info(f"{threading.current_thread().name}: Using the following URL to query uniprot.org: {query}")
         res = self.run_uniprot_query(query)
-        syns, syns_found = self.extract_uniprot_syns(res)
 
-        # add the original term back in to the list of synonyms, and de-duplicate
-        syns.insert(0, self.gene_id)
+        if res == "uniprot request failed":
+            return [self.gene_id], False
+
+        else:
+            syns, syns_found = self.extract_uniprot_syns(res)
+            # add the original term back in to the list of synonyms, and de-duplicate
+            syns.insert(0, self.gene_id)
         return list(set(syns)), syns_found
 
 
