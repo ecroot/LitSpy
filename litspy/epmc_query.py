@@ -691,7 +691,7 @@ class Query:
                 syns = copy.deepcopy(self.kwd_syn_lists[int(k.strip("kwd")) - 1])
             else:
                 self.logger.error(f"Unrecognised query element type '{k}'. Cannot split query.")
-                exit()
+                exit() # note: exit commands do not work when running within a thread - which this command often is
 
             # build the query strings to be no longer than the chunk size
             while syns:
@@ -1039,7 +1039,7 @@ class Query:
         # raise relevant exceptions if there are errors for the request
         except (requests.exceptions.HTTPError, requests.exceptions.ConnectionError) as err:
             self.logger.error(err)
-            exit()
+            exit() # note: exit commands do not work when running within a thread - which this command often is
 
         return res_text
 
@@ -1117,7 +1117,7 @@ class Query:
             # raise relevant exceptions if there are errors for the request
             except (requests.exceptions.HTTPError, requests.exceptions.ConnectionError) as err:
                 self.logger.error(err)
-                exit()
+                exit() # note: exit commands do not work when running within a thread - which this command often is
 
             potential_doc_info, c_mark, hit_count = \
                 self.parse_potential_result_content_for_relevant_info(res_text, id_list)
@@ -1176,7 +1176,7 @@ class Query:
                              f"queries in Europe PMC")
 
             root_doc_info = [item for sublist in root_results for item in sublist]
-            print(len(root_doc_info))
+            # print(len(root_doc_info))
             doc_info.extend(root_doc_info)
 
         # add the list of results text strings to the dictionary
