@@ -11,10 +11,10 @@ co-occurence of the following:
 and produces summaries of the search results in HTML and optionally Excel format.
 
 ## INSTALLATION
-The tool has been packaged in to a wheel to make installation easy; simply ensure that you have Python3.6 or higher
+The tool is available from pypi, and can be easily installed and upgraded in the usual way using pip. Just ensure that you have Python3.6 or higher
 installed on your machine, and run the command
 
-`pip install path/to/litspy-version-py3-none-any.whl`
+`pip install litspy`
 
 (or, if your default Python version is Python2, replace `pip` with `pip3`)
 
@@ -145,7 +145,8 @@ Emma Croot, 2020, ec339@le.ac.uk, github.com/ec339
 MIT (see LICENCE.txt)
 
 ## CHANGE LOG
-This is the first version of the tool, so there are currently no changes
+There have currently been no major changes to the tool. See [commits at github](https://github.com/ec339/LitSpy/commits/master) 
+for information about minor updates. 
 
 ## ACKNOWLEDGEMENTS
 **OmixLitMiner**
