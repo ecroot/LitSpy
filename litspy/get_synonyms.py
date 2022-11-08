@@ -731,7 +731,7 @@ class GetUniprotSynonyms:
         """
         # build the query string with the id type, gene id and tax id from a single data frame row
         query = f"https://rest.uniprot.org/uniprotkb/search?query={self.id_type}:{self.gene_id}+organism_id:{self.tax_id}+" \
-                f"reviewed:true&columns=genes&format=tsv"
+                f"reviewed:true&fields=gene_names&format=tsv"
         return query
 
     def run_uniprot_query(self, query):
