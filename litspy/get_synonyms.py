@@ -124,16 +124,18 @@ class OLSRequests:
 
 class ExtractOLSSynonyms:
     """class for extracting and cleaning synonyms from OLS's json-derived dicts"""
-    def __init__(self, original_term, logger, n_threads=0):
+    def __init__(self, original_term, logger, min_syn_len, n_threads=0):
         """
         initialise synonyms object with logger, original term, synonym list, headers, noise greek letters
 
         :param str original_term: a supplied gene, disease or tissue/organ
         :param logging.Logger logger: project logger
+        :param int min_syn_len: synonyms shorter than this value will be discarded
         :param int n_threads: number of threads to use in any multithreading tasks
         """
         self.logger = logger
         self.original_term = original_term
+        self.min_syn_len = min_syn_len
         self.n_threads = n_threads
         self.syns = []
 
@@ -365,8 +367,8 @@ class ExtractOLSSynonyms:
                 term = re.sub(r"\s{2,}", " ", term)  # de-duplicate spaces
                 term = term.strip()  # strip trailing spaces
 
-                # keep cleaned terms that are longer than two characters
-                if len(term) > 1:
+                # keep cleaned terms that are at least the minimum syn length
+                if len(term) >= self.min_syn_len:
                     # for tissues, remove syns that are a single letter followed by digits
                     # (e.g. A10 is very noisy, but only remove these syns from tissues because e.g. p53 is a valid gene)
                     if syn_type == "tissue":

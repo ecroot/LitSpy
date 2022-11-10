@@ -585,7 +585,7 @@ class LitSpy:
         # initialise the query object with the data frame of input data, disease, tissue and other EPMC args
         my_query = Query(df=df, logger=self.logger, disease=self.args.disease, tissue=self.args.tissue,
                          kwds=self.args.kwds, others=self.args.other_args, expand=self.args.expand,
-                         n_threads=self.args.n_threads)
+                         n_threads=self.args.n_threads, min_syn_len=self.args.min_syn_len)
 
         # run the queries and get the results
         results_dicts = my_query.get_results_from_epmc()

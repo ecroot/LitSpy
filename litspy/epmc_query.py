@@ -17,7 +17,7 @@ from litspy.noisy_phrases import common_gene_noise, stop_words
 
 class Query:
     def __init__(self, df, logger, disease=None, tissue=None, kwds=None, others=None, expand=None,
-                 n_threads=multiprocessing.cpu_count()):
+                 n_threads=multiprocessing.cpu_count(), min_syn_len=None):
         """
         initialise object with relevant values
 
@@ -28,6 +28,8 @@ class Query:
         :param str kwds: a comma-separated string of specified keywords
         :param dict others: a dictionary of EPMC field: value
         :param bool expand: whether to get synonyms for keywords
+        :param int n_threads: number of threads available
+        :param int min_syn_len: minimum character length of synonyms to be included
         """
         self.logger = logger
         self.df = df
@@ -46,6 +48,7 @@ class Query:
         self.kwd_syn_lists = []
         self.gene_syns = []
         self.gene_syn_roots = []
+        self.min_syn_len = min_syn_len
 
     @staticmethod
     def add_abstract_title_and_join_synonyms(syns, search_in_kwds=True, join_on_and=False):
@@ -104,7 +107,7 @@ class Query:
         """
         # initialise job handler and synonyms objects, and list of synonyms
         ReadyThready.set_logger(self.logger)
-        synonyms = ExtractOLSSynonyms(term, self.logger, n_threads=self.n_threads)
+        synonyms = ExtractOLSSynonyms(term, self.logger, self.min_syn_len, n_threads=self.n_threads)
         syns = [term]
 
         self.logger.info(f"{threading.current_thread().name}: Collecting synonyms for '{term}'")
@@ -351,7 +354,7 @@ class Query:
         """
         # initialise
         filtered_syns = []
-        cleaner = ExtractOLSSynonyms(gene, self.logger)
+        cleaner = ExtractOLSSynonyms(gene, self.logger, self.min_syn_len)
 
         # perform the normal synonym cleaning
         first_clean = cleaner.clean_syn_list(syns_list=all_syns)
@@ -532,7 +535,7 @@ class Query:
         if fam_roots:
             self.logger.info(f"{threading.current_thread().name}: One or more synonyms of '{orig_gene}' are predicted "
                              f"to be in a systematically named family of genes")
-            root_clean = ExtractOLSSynonyms(orig_gene, self.logger)
+            root_clean = ExtractOLSSynonyms(orig_gene, self.logger, self.min_syn_len)
             self.logger.info(f"{threading.current_thread().name}: Cleaning collected root phrases for synonyms of "
                              f"'{orig_gene}'")
             fam_roots = root_clean.clean_syn_list(syns_list=fam_roots)

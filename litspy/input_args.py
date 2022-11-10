@@ -31,6 +31,7 @@ class Arguments:
         self.charts = False
         self.top_ten = False
         self.quiet_results = False
+        self.min_syn_len = None
 
     @staticmethod
     def determine_required(arg_flag):
@@ -105,6 +106,7 @@ class Arguments:
                   "\n[-w] control creation of top ten lists of words in abstracts (e.g. to substitute for wordclouds)"
                   "\nand any valid Europe PMC search parameters, preceded by -- (e.g. --PUB_YEAR 2000). For a list of "
                   "available parameters and their search syntax, visit https://europepmc.org/Help#SSR"
+                  "\n[-z] minimum length of synonyms (optional. default is 2 characters)"
         )
         parser.add_argument(
             '-i', '--infile', dest='infile',
@@ -180,6 +182,12 @@ class Arguments:
             '-m', '--multithread', dest='n_threads', type=int, default=0,
             help="Number of cores to use (if left blank, the number of available cores will be determined automatically"
                  " and all will be used)"
+        )
+        parser.add_argument(
+            '-z', '--min-syn-len', dest='min_syn_len', type=int, default=2,
+            help="Minimum number of characters that synonyms should be (the default is 2). It is recommended to use "
+                 "this option to specify a longer minimum synonym length for your search if a two-character synonym has"
+                 " negatively affected the results of a previous search."
         )
         return parser
 
@@ -334,8 +342,8 @@ class Arguments:
         # for each supplied arg, if it is not in the list of base args, add it to the other args dict
         for k, v in arg_dict.items():
             if v is not None:
-                if k not in ["infile", "outfile", "genes", "type", "taxid", "charts", "top_ten", "n_threads",
-                             "disease", "tissue", "kwd", "log", 'log_file', 'quiet_results', 'expand']:
+                if k not in ["infile", "outfile", "genes", "type", "taxid", "charts", "top_ten", "n_threads", "log",
+                             "disease", "tissue", "kwd", 'log_file', 'quiet_results', 'expand', "min_syn_len"]:
                     other_args[k] = v
         return other_args
 
@@ -371,6 +379,7 @@ class Arguments:
         self.log_file = arg_dict['log_file']
         self.expand = arg_dict['expand']
         self.n_threads = arg_dict['n_threads']
+        self.min_syn_len = arg_dict['min_syn_len']
 
         if 'Linux' in uname().system and 'Microsoft' in uname().release:
             self.quiet_results = True
