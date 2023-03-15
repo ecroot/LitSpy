@@ -139,7 +139,7 @@ contexts, and be combined with other tools. However, it can also be useful as a 
 identify articles of interest more comprehensively than by keyword searches that do not use synonym expansion.
 
 ## AUTHOR
-Emma Croot, 2020, ec339@le.ac.uk, github.com/ec339
+E Croot, 2020, ec339@le.ac.uk, github.com/ec339
 
 ## LICENCE
 MIT (see LICENCE.txt)
