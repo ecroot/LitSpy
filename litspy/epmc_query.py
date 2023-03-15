@@ -65,6 +65,9 @@ class Query:
 
         # create e.g. ABSTRACT:"synonym" OR TITLE:"synonym" for every synonym, and add to a list
         for syn in syns:
+            """
+            deprecated code from before the introduction of the combined title & abstract field
+            
             # if the synonym already has the fields added (possible for keyword synonyms), add it to the list
             if syn.startswith("(TITLE:"):
                 exp_syns.append(syn.strip("()"))  # remove brackets to avoid extra brackets getting added later
@@ -73,6 +76,15 @@ class Query:
                 exp_syns.append(f'TITLE:"{syn}" OR KW:"{syn}" OR ABSTRACT:"{syn}"')
             else:
                 exp_syns.append(f'TITLE:"{syn}" OR ABSTRACT:"{syn}"')
+            """
+            # if the synonym already has the fields added (possible for keyword synonyms), add it to the list
+            if syn.startswith("(TITLE_ABS:"):
+                exp_syns.append(syn.strip("()"))  # remove brackets to avoid extra brackets getting added later
+            # else, create the field query and add it to the list
+            elif search_in_kwds:
+                exp_syns.append(f'TITLE_ABS:"{syn}" OR KW:"{syn}"')
+            else:
+                exp_syns.append(f'TITLE_ABS:"{syn}"')
 
         # join the items in the list to create e.g. (ABSTRACT:"1" OR TITLE:"1" OR ABSTRACT:"2" OR TITLE:"2")
         if join_on_and:
@@ -737,6 +749,8 @@ class Query:
         :param str genes: string in the format (ABSTRACT:"syn" OR TITLE:"syn" OR ABSTRACT:"syn2"...) for gene syns
         :param list kwds: list of strings in the format (ABSTRACT:"kwd" OR TITLE:"kwd"...) for key words
         :return: list of strings of EPMC queries
+
+        * since the introduction of the TITLE_ABS index field (Mar 2023), the string formats now use TITLE_ABS instead
         """
         # initialise, calculate the sum of the lengths of query strings for keywords
         queries = []
