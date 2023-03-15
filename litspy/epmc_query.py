@@ -56,7 +56,8 @@ class Query:
         add parameters for EMPC search in abstract and title regions
 
         :param list syns: list of synonyms
-        :param bool search_in_kwds: whether to search in the keywords list for the term (false for gene roots)
+        :param bool search_in_kwds: whether to search in the keywords list for the term
+                                    (false for gene roots, otherwise True)
         :param bool join_on_and: whether to join terms on AND (default false, to join on OR)
         :return: string of joined synonyms with relevant title and abstract parameters
         """
@@ -661,27 +662,35 @@ class Query:
 
         return len_dict, long_strs
 
-    def split_long_queries(self, len_dict, max_length):
+    def split_long_queries(self, len_dict, max_length, search_in_kwds):
         """
         create multiple smaller queries that cover the full combinations of terms present in supplied query strings
 
         :param dict len_dict: dict containing query strings, their lengths and the number of greek characters in them
         :param int max_length: 8000 (URI limit) - the length of the constant parts of the URIs (base url, settings)
+        :param bool search in kwds: true except for gene roots, which should not be found within the kwds field
         :return: len_dict with longer query strings removed, list of lists of combinations of split longer query strings
         :rtype: tuple[dict, list]
         """
         # initialise list of lists
         query_string_chunks = []
 
+        # initialise number of search fields used
+        if search_in_kwds:
+            fields_num = 2
+        else:
+            fields_num = 1
+
         # identify the long query string(s) to be split
         shorter_len_dict, long_strs = self.identify_long_queries(len_dict, max_length)
 
         # determine the size to split the longer query elements in to:
         # # take away the estimated total length of the shorter queries from max_length,
-        #   including an estimate for the number of brackets and ampersands used
+        #       including an estimate for the number of brackets and ampersands used in each query (10)
         # # divide (to the nearest whole number) by the number of long strings that need to be split
-        # # minus 100 more characters to approximately account for the final 'ABSTRACT:"synonym"' at the end of each
-        #   chunk (particularly long synonyms may exceed this, but this will be rare)
+        # # minus 100 more characters to approximately account for the final term to be added at the end of each
+        #   chunk (particularly long synonyms may exceed this, but this will be rare, and overcautious estimation of
+        #   other query elements should compensate in these rare circumstances)
 
         est_total_len = sum(self.create_query_length_list(shorter_len_dict)) + (len(shorter_len_dict) * 10)
         chunk_size = ((max_length - est_total_len) // len(long_strs)) - 100
@@ -710,9 +719,10 @@ class Query:
 
             # build the query strings to be no longer than the chunk size
             while syns:
-                # calculate the length the query string will be upon the addition of the next synonym, and if the
-                # total is lower than the chunk size then incorporate the next synonym
-                qstring_len = len(parse.quote_plus(querystring)) + (len(parse.quote_plus(syns[i])) * 3) + 62
+                # calculate the length the query string will be upon the addition of the next synonym
+                #   (adding it once for each field it's searched within: field_nums, usually 2),
+                #   and if the total is lower than the chunk size then incorporate the next synonym
+                qstring_len = len(parse.quote_plus(querystring)) + (len(parse.quote_plus(syns[i])) * fields_num) + 62
                 if i == 0 and qstring_len > chunk_size:
                     self.logger.warning(f"The {k} synonym '{syns[i]}' is too long, and will be excluded from the "
                                         f"queries")
@@ -721,7 +731,8 @@ class Query:
                         i += 1
                         querystring = self.add_abstract_title_and_join_synonyms(syns=syns[:i])
                         try:
-                            qstring_len = len(parse.quote_plus(querystring)) + (len(parse.quote_plus(syns[i])) * 3) + 62
+                            qstring_len = len(parse.quote_plus(querystring)) + \
+                                          (len(parse.quote_plus(syns[i])) * fields_num) + 62
                         except IndexError:
                             finished = True  # when i is no longer accessible, every syn is accounted for
                     querystrings.append(querystring)
@@ -738,7 +749,8 @@ class Query:
 
         return shorter_len_dict, chunk_combinations
 
-    def create_epmc_queries(self, search_description, diseases="", tissues="", others="", genes="", kwds=[]):
+    def create_epmc_queries(self, search_description, diseases="", tissues="", others="",
+                            genes="", kwds=[], search_in_kwds=True):
         """
         create the EPMC query/queries from the supplied arguments (and their synonyms where relevant)
 
@@ -748,6 +760,7 @@ class Query:
         :param str others: string in the format PARAM1:value & PARAM2:value
         :param str genes: string in the format (ABSTRACT:"syn" OR TITLE:"syn" OR ABSTRACT:"syn2"...) for gene syns
         :param list kwds: list of strings in the format (ABSTRACT:"kwd" OR TITLE:"kwd"...) for key words
+        :param bool search_in_kwds: whether or not to search within the kwds field (True except for gene roots)
         :return: list of strings of EPMC queries
 
         * since the introduction of the TITLE_ABS index field (Mar 2023), the string formats now use TITLE_ABS instead
@@ -761,11 +774,16 @@ class Query:
         # the character limit for EPMC API URIs (after encoding) is around 8000, so accounting for constants
         # e.g. some brackets and ampersands, the base url 'https://www.ebi.ac.uk/europepmc/webservices/rest/search'
         # and settings e.g. 'format=xml', use 7500 as the max length to be safe
+
+        # leftover amount is the number of characters that can be used after other fields have been added to the
+        # usual base query
         leftover_amount = 7500 - len_dict['others']['len']
 
+        # calculate the lengths of the query parts
         query_lengths_list = self.create_query_length_list(len_dict)
 
-        # if the query could be too long, split it in to multiple smaller queries, else make a single query
+        # if the query is longer than the leftover amount (i.e. could be too long for the server), then split it into
+        # multiple smaller queries. else, make a single query.
         # + 20 to approximately account for encoded brackets and ampersands added around/between queries
         if sum(query_lengths_list) + 20 > leftover_amount:
             # log and initialise
@@ -774,7 +792,7 @@ class Query:
                              f"queries for the search '{search_description}'")
 
             # identify and split query parts that are too long
-            len_dict, chunk_combinations = self.split_long_queries(len_dict, leftover_amount)
+            len_dict, chunk_combinations = self.split_long_queries(len_dict, leftover_amount, search_in_kwds)
             self.logger.info(f"{threading.current_thread().name}: {len(chunk_combinations)} shorter queries will be "
                              f"built for '{search_description}'")
 
