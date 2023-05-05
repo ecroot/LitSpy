@@ -766,8 +766,9 @@ class GetUniprotSynonyms:
         """
         gene_syns_found = False
 
-        # process the retrieved text in to a list of gene synonyms
+        # process the retrieved text into a list of gene synonyms
         gene_syns = res.text.replace("Gene names", "")
+        gene_syns = res.text.replace("Gene Names", "")
         gene_syns = gene_syns.strip()
         if gene_syns == "":
             gene_syns = [self.gene_id]

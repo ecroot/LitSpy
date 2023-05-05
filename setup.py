@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="litspy",
-    version="0.0.6",
+    version="0.0.6.1",
     author="Emma Croot",
     author_email="ec339@le.ac.uk",
     description="Searches through all titles and abstracts available in Europe PMC for co-occurrence of supplied terms "
